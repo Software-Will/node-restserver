@@ -1,6 +1,5 @@
 const { response, request } = require('express'); // No es necesario hacerlo pero sirve como objeto para obtener parametros, o tipado
 const bcryptjs = require('bcryptjs');
-const { validationResult } = require('express-validator');
 
 const User = require('./../models/user.js');
 
@@ -21,18 +20,8 @@ const userGet = (req = request, res = response) => {
 
 const userPost = async (req = request, res = response) => {
 
-    const errors = validationResult(req);
-    // Si hay errores -> lanzalos
-    if (!errors.isEmpty()) return res.status(400).json(errors);
-
-
     const { nombre, correo, password, rol } = req.body; // Excluir solo google -> {google, ...data} -> data es lo mismo que la desestructuracion actual
     const user = new User({ nombre, correo, password, rol }); // Creamos la instancia en mongodb
-
-    // Verificar si el correo existe
-    const existeEmail = await User.findOne({ correo });
-    if (existeEmail) return res.status(400).json({ msg: 'El correo ya se encuentra registrado' });
-
 
     // Encriptar contraseña -> hash
     const salt = bcryptjs.genSaltSync(10); // Valor para las vueltas que se le da a la encriptacion de la contraseña
@@ -48,13 +37,23 @@ const userPost = async (req = request, res = response) => {
 
 }
 
-const userPut = (req = request, res = response) => {
+const userPut = async (req = request, res = response) => {
 
     const { id } = req.params; // -> req.params.id
+    const { _id, password, google, correo, ...resto } = req.body;
+
+    // TODO: validar contra la base de datos
+    if (password) {
+        // Encriptar contraseña -> hash
+        const salt = bcryptjs.genSaltSync(10);
+        resto.password = bcryptjs.hashSync(password, salt);
+    }
+
+    const user = await User.findByIdAndUpdate(id, resto); // Buscalo por el id y actualizalos -> retorna los datos actualizados del objeto
 
     res.status(400).json({
         msg: 'put API - controller',
-        id
+        user
     });
 }
 

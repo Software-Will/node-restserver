@@ -32,7 +32,11 @@ const UserSchema = Schema({
     }
 });
 
-
+// Funcion normal para usar el this
+UserSchema.methods.toJSON = function () {
+    const { __v, password, ...user } = this.toObject(); // Cuando se mande a llamar el JSON evitamos enviar el __v y password
+    return user;
+}
 
 
 

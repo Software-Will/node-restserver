@@ -3,18 +3,31 @@ const bcryptjs = require('bcryptjs');
 
 const User = require('./../models/user.js');
 
-const userGet = (req = request, res = response) => {
+const userGet = async (req = request, res = response) => {
 
     // -> ?q=hola&nombre=will&apikey=1234567890
-    const { q, nombre = 'No name', apikey, page = 1, limit } = req.query; // -> ?
+    // const { q, nombre = 'No name', apikey, page = 1, limit } = req.query; // -> ?
+
+    const { limite = 5, desde = 0 } = req.query;
+    const query = { estado: true }; // Solo me devuelves los registros que estan activos
+
+    // const users = await User.find(query)
+    //     .skip(Number(desde))
+    //     .limit(Number(limite));
+
+    // const total = await User.countDocuments(query); // Retorna el numero de registros de la coleccion
+
+    // De esta forma se ejecutan ambos procedimientos simultaneamente con un "await" unico , mas rapido | resp
+    const [total, users] = await Promise.all([
+        User.countDocuments(query),
+        User.find(query)
+            .skip(Number(desde))
+            .limit(Number(limite))
+    ]);
 
     res.json({
-        msg: 'get API - controller',
-        q,
-        nombre,
-        apikey,
-        page,
-        limit
+        total,
+        users
     });
 }
 
@@ -30,10 +43,7 @@ const userPost = async (req = request, res = response) => {
     // Guardar en DB
     await user.save(); // ! Falta manejar errores
 
-    res.status(201).json({
-        msg: 'post API - controller',
-        user
-    });
+    res.status(201).json(user);
 
 }
 
@@ -51,25 +61,28 @@ const userPut = async (req = request, res = response) => {
 
     const user = await User.findByIdAndUpdate(id, resto); // Buscalo por el id y actualizalos -> retorna los datos actualizados del objeto
 
-    res.status(400).json({
-        msg: 'put API - controller',
-        user
-    });
+    res.status(400).json(user);
 }
 
-const userDelete = (req = request, res = response) => {
-    res.json({
-        msg: 'delete API - controller'
-    });
+const userDelete = async (req = request, res = response) => {
+
+    const { id } = req.params;
+
+    // Fisicamente lo borramos
+    // const user = await User.findByIdAndDelete(id);
+
+    // Cambiamos su estado de true a false
+    const user = await User.findByIdAndUpdate(id, { estado: false });
+
+    res.json(user);
 }
 
 const userPatch = (req = request, res = response) => {
+
     res.json({
-        msg: 'patch API - controller'
+        msg: 'patch API - controller',
     });
 }
-
-
 
 module.exports = {
     userGet,

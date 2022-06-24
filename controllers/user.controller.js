@@ -68,17 +68,20 @@ const userDelete = async (req = request, res = response) => {
 
     const { id } = req.params;
 
+    // const uid = req.uid; // Recuperado del middleware validar-jwt -> del user autenticado que borra -> primero te autenticas -> {user,uid}
+
     // Fisicamente lo borramos
     // const user = await User.findByIdAndDelete(id);
 
     // Cambiamos su estado de true a false
     const user = await User.findByIdAndUpdate(id, { estado: false });
+    // const userAutenticado 
+    // const userAutenticado = req.user; -> para saber cual es el que elimina
 
     res.json(user);
 }
 
 const userPatch = (req = request, res = response) => {
-
     res.json({
         msg: 'patch API - controller',
     });

@@ -33,15 +33,18 @@
     <!--Libreria de google sign-in-->
 
     <script>
+      let url = window.location.hostname.includes("localhost")
+        ? "http://localhost:3000/api/auth/google"
+        : "https://willcd-node-restserver.herokuapp.com/";
+
       function handleCredentialResponse(response) {
         // Google token : ID_TOKEN
         // console.log("id_token", response.credential);
 
         const body = { id_token: response.credential };
 
-        const url = "http://localhost:3000";
         // ring a Bell Stream -> fetch por defecto es get
-        fetch(`${url}/api/auth/google`, {
+        fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

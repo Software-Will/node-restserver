@@ -9,8 +9,12 @@ class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
-        this.userPath = '/api/user';
-        this.authPath = '/api/auth';
+
+        this.paths = {
+            auth: '/api/auth',
+            categorias: '/api/categorias',
+            user: '/api/user'
+        }
 
         // Conectar a base de datos
         this.connectDB();
@@ -41,8 +45,9 @@ class Server {
 
     routes() {
         // Middleware condicionado
-        this.app.use(this.authPath, require('./../routes/auth.routes'));
-        this.app.use(this.userPath, require('./../routes/user.routes'));
+        this.app.use(this.paths.auth, require('./../routes/auth.routes'));
+        this.app.use(this.paths.categorias, require('./../routes/categorias.routes'));
+        this.app.use(this.paths.user, require('./../routes/user.routes'));
     }
 
     listen() {

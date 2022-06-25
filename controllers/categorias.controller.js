@@ -20,7 +20,7 @@ const getCategorias = async (req = request, res = response) => {
     res.json({
         total,
         categorias
-    })
+    });
 }
 
 
@@ -55,7 +55,7 @@ const postCategoria = async (req = request, res = response) => {
     const categoria = new Categoria(data);
 
     // Guardar DB
-    categoria.save();
+    await categoria.save();
 
     res.status(201).json(categoria);
 

@@ -13,6 +13,7 @@ class Server {
         this.paths = {
             auth: '/api/auth',
             categorias: '/api/categorias',
+            productos: '/api/productos',
             user: '/api/user'
         }
 
@@ -47,6 +48,7 @@ class Server {
         // Middleware condicionado
         this.app.use(this.paths.auth, require('./../routes/auth.routes'));
         this.app.use(this.paths.categorias, require('./../routes/categorias.routes'));
+        this.app.use(this.paths.productos, require('./../routes/productos.routes'));
         this.app.use(this.paths.user, require('./../routes/user.routes'));
     }
 
